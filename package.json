@@ -30,8 +30,9 @@
   },
   "files": [
     "adapter.js",
-    "harmony-hub.js",
+    "hub.js",
     "property.js",
+    "device.js",
     "SHA256SUMS",
     "LICENSE"
   ],

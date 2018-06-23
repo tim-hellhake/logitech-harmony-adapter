@@ -1,6 +1,7 @@
 'use strict';
 
 const Property = require('./property');
+const HarmonyDevice = require('./device');
 const harmony = require("harmonyhubjs-client");
 
 let Device;
@@ -22,12 +23,13 @@ class HarmonyHub extends Device {
         super(adapter, id);
         this.name = hub.friendlyName;
         this.description = "Logitech Harmony Hub";
+        this.ip = hub.ip;
 
         this.properties.set('on', new Property(this, 'on', {
             type: "boolean"
         }, false));
 
-        this.ready = harmony(hub.ip).then((client) => {
+        this.ready = harmony(this.ip).then((client) => {
             this.client = client;
             return this.setupClient();
         }).then(() => this.adapter.handleDeviceAdded(this));
@@ -43,7 +45,13 @@ class HarmonyHub extends Device {
 
     async setupClient() {
         this.client._xmppClient.on('offline', () => {
-            this.adapter.removeDevice(this.id);
+            harmony(this.ip).then((client) => {
+                this.client.end();
+                this.client.removeAllListeners();
+                this.client._xmppClient.removeAllListeners();
+                this.client = client;
+                return this.setupClient();
+            });
         });
 
         const isOff = await this.client.isOff();
@@ -52,7 +60,6 @@ class HarmonyHub extends Device {
         }
 
         this.client.on('stateDigest', (state) => {
-            console.log(state);
             if(state.activityStatus == 0) {
                 this.updateProp('on', false);
             }
@@ -64,7 +71,6 @@ class HarmonyHub extends Device {
         const activities = await this.client.getActivities();
         for(const activity of activities) {
             if(activity.id != -1) {
-                //TODO nice labels for actions?
                 this.addAction(activity.id, {
                     label: activity.label,
                     description: activity.label
@@ -74,8 +80,11 @@ class HarmonyHub extends Device {
 
         const commands = await this.client.getAvailableCommands();
 
-        //TODO also add all the devices the hub controls
-        console.log(commands.device);
+        for(const device of commands.device) {
+            if(device.controlGroup.length) {
+                const dev = new HarmonyDevice(this.adapter, this, device.id, device);
+            }
+        }
     }
 
     async notifyPropertyChanged(property) {
@@ -92,7 +101,7 @@ class HarmonyHub extends Device {
         super.notifyPropertyChanged(property);
     }
 
-    async preformAction(action) {
+    async performAction(action) {
         await this.client.startActivity(action.name);
     }
 }

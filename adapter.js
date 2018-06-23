@@ -1,7 +1,9 @@
 'use strict';
 
 const HarmonyHubDiscover = require("harmonyhubjs-discover");
-const HarmonyHub = require("./harmony-hub");
+const HarmonyHub = require("./hub");
+
+//TODO hue bulbs?
 
 let Adapter;
 try {
@@ -40,7 +42,7 @@ class HarmonyAdapter extends Adapter {
     */
     async addDevice(device) {
         if(device.uuid in this.devices) {
-            throw 'Device: ' + device.host + ' already exists.';
+            throw 'Device: ' + device.uuid + ' already exists.';
         }
         else {
             const hub = new HarmonyHub(this, device.uuid, device);
@@ -56,6 +58,9 @@ class HarmonyAdapter extends Adapter {
         return new Promise((resolve, reject) => {
             const device = this.devices[deviceId];
             if(device) {
+                device.client.end();
+                device.client.removeAllListeners();
+                device.client._xmppClient.removeAllListeners();
                 this.handleDeviceRemoved(device);
                 resolve(device);
             }
