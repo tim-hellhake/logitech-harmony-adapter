@@ -1,0 +1,46 @@
+{
+  "name": "logitech-harmony-adapter",
+  "version": "0.0.0",
+  "description": "Support for Logitech Harmony hubs",
+  "main": "adapter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./build.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/freaktechnik/logitech-harmony-adapter.git"
+  },
+  "keywords": [
+    "mozilla",
+    "iot",
+    "adapter",
+    "logitech",
+    "harmony"
+  ],
+  "author": "Martin Giger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/freaktechnik/logitech-harmony-adapter/issues"
+  },
+  "homepage": "https://github.com/freaktechnik/logitech-harmony-adapter#readme",
+  "dependencies": {
+    "harmonyhubjs-client": "^1.1.10",
+    "harmonyhubjs-discover": "^1.1.1"
+  },
+  "files": [
+    "adapter.js",
+    "harmony-hub.js",
+    "property.js",
+    "SHA256SUMS",
+    "LICENSE"
+  ],
+  "moziot": {
+    "api": {
+      "min": 1,
+      "max": 2
+    },
+    "plugin": true,
+    "exec": "{nodeLoader} {path}"
+  }
+}
