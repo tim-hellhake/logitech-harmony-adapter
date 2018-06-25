@@ -33,6 +33,7 @@
     "hub.js",
     "property.js",
     "device.js",
+    "action-property.js",
     "SHA256SUMS",
     "LICENSE"
   ],

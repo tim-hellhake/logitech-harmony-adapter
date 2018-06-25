@@ -68,6 +68,25 @@ class HarmonyHub extends Device {
             }
         });
 
+        this.client._xmppClient.on('stanza', (stanza) => {
+            if(stanza.name == 'message') {
+                for(const child of stanza.children) {
+                    if(child.name == "event" && child.attrs.type == 'harmonyengine.metadata?notify') {
+                        //has children with '{"musicMeta":{"crossfade":false,"deviceId":"34596878"}}' etc.
+                        for(const change of child.children) {
+                            if(typeof change === "string") {
+                                const parsed = JSON.parse(change);
+                                if("musicMeta" in parsed) {
+                                    const device = this.adapter.getDevice(this.id + parsed.musicMeta.deviceId);
+                                    device.updateMeta(parsed.musicMeta);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         const activities = await this.client.getActivities();
         for(const activity of activities) {
             if(activity.id != -1) {
@@ -78,12 +97,31 @@ class HarmonyHub extends Device {
             }
         }
 
+        this.getChildDevices();
+    }
+
+    async getChildDevices() {
         const commands = await this.client.getAvailableCommands();
 
         for(const device of commands.device) {
-            if(device.controlGroup.length) {
-                const dev = new HarmonyDevice(this.adapter, this, device.id, device);
+            const id = this.id + device.id;
+            if(device.controlGroup.length && !this.adapter.getDevice(id)) {
+                const dev = new HarmonyDevice(this.adapter, this, id, device);
             }
+        }
+
+        const automation = await new Promise((resolve) => {
+            const autoId = Math.floor(Math.random() * 1000000);
+            this.client._responseHandlerQueue.push({
+                canHandleStanza: (s) => s.attr('id') == autoId,
+                deferred: { resolve },
+                responseType: 'json'
+            });
+            this.client._xmppClient.send(`<iq type="get" id="${autoId}"><oa xmlns="connect.logitech.com" mime="vnd.logitech.harmony/vnd.logitech.harmony.automation?getState"/></iq>`);
+        });
+
+        for(const id in automation) {
+            //const dev = new HarmonyBulb(this.adapter, this, id, automation[id]);
         }
     }
 

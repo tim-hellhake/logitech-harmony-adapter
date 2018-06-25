@@ -23,16 +23,6 @@ class HarmonyAdapter extends Adapter {
         super(addonManager, 'HarmonyAdapter', packageName);
         addonManager.addAdapter(this);
 
-        this.discover = new HarmonyHubDiscover(61991);
-
-        this.discover.on('online', (hub) => {
-            this.addDevice(hub);
-        });
-
-        this.discover.on('offline', (hub) => {
-            this.removeDevice(hub.uuid);
-        });
-
         this.startPairing(30);
     }
 
@@ -43,6 +33,10 @@ class HarmonyAdapter extends Adapter {
     async addDevice(device) {
         if(device.uuid in this.devices) {
             throw 'Device: ' + device.uuid + ' already exists.';
+            const dev = this.getDevice(device.uuid);
+            if(dev instanceof HarmonyHub) {
+                await dev.getChildDevices();
+            }
         }
         else {
             const hub = new HarmonyHub(this, device.uuid, device);
@@ -54,20 +48,30 @@ class HarmonyAdapter extends Adapter {
     * @param {String} deviceId ID of the device to remove.
     * @return {Promise} which resolves to the device removed.
     */
-    removeDevice(deviceId) {
-        return new Promise((resolve, reject) => {
-            const device = this.devices[deviceId];
-            if(device) {
+    async removeDevice(deviceId) {
+        const device = this.devices[deviceId];
+        if(device) {
+            const deviceCount = Object.keys(this.devices).length;
+            const isHub = device instanceof HarmonyHub;
+            if(deviceCount == 1 && isHub) {
                 device.client.end();
                 device.client.removeAllListeners();
                 device.client._xmppClient.removeAllListeners();
+            }
+            // Only remove hub when it's the last device. Breaks if there are multiple hubs...
+            if(!isHub || deviceCount == 1) {
                 this.handleDeviceRemoved(device);
-                resolve(device);
             }
-            else {
-                reject('Device: ' + deviceId + ' not found.');
+
+            if(!isHub && deviceCount == 2 && this.getDevice(device.hub.id)) {
+                await this.removeDevice(device.hub.id);
             }
-        });
+
+            return device;
+        }
+        else {
+            throw 'Device: ' + deviceId + ' not found.';
+        }
     }
 
     /**
@@ -76,15 +80,32 @@ class HarmonyAdapter extends Adapter {
     * @param {Number} timeoutSeconds Number of seconds to run before timeout
     */
     startPairing(_timeoutSeconds) {
-        this.discover.start();
-        setTimeout(() => this.cancelPairing(), _timeoutSeconds * 1000);
+        if(!this.discover) {
+            this.discover = new HarmonyHubDiscover(61991);
+            this.discover.on('online', (hub) => {
+                this.addDevice(hub).catch(console.error);
+            });
+
+            this.discover.on('offline', (hub) => {
+                //TODO should probably also remove all child devices controlled by this hub.
+                this.removeDevice(hub.uuid).catch(console.error);
+            });
+            this.discover.start();
+            setTimeout(() => this.cancelPairing(), _timeoutSeconds * 1000);
+        }
     }
 
     /**
     * Cancel the pairing/discovery process.
     */
     cancelPairing() {
-        this.discover.stop();
+        if(this.discover) {
+            this.discover.stop();
+            this.discover.removeAllListeners();
+            this.discover.ping.socket.unref();
+            this.discover.ping.socket = undefined;
+            this.discover = undefined;
+        }
     }
 
     /**
@@ -94,9 +115,9 @@ class HarmonyAdapter extends Adapter {
     */
     removeThing(device) {
         this.removeDevice(device.id).then(() => {
-            console.log('SonosAdapter: device:', device.id, 'was unpaired.');
+            console.log('HarmonyAdapter: device:', device.id, 'was unpaired.');
         }).catch((err) => {
-            console.error('SonosAdapter: unpairing', device.id, 'failed');
+            console.error('HarmonyAdapter: unpairing', device.id, 'failed');
             console.error(err);
         });
     }
