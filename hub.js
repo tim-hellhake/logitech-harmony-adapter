@@ -2,6 +2,7 @@
 
 const Property = require('./property');
 const HarmonyDevice = require('./device');
+const HarmonyBulb = require("./bulb");
 const harmony = require("harmonyhubjs-client");
 
 let Device;
@@ -110,19 +111,19 @@ class HarmonyHub extends Device {
             }
         }
 
-        const automation = await new Promise((resolve) => {
-            const autoId = Math.floor(Math.random() * 1000000);
-            this.client._responseHandlerQueue.push({
-                canHandleStanza: (s) => s.attr('id') == autoId,
-                deferred: { resolve },
-                responseType: 'json'
-            });
-            this.client._xmppClient.send(`<iq type="get" id="${autoId}"><oa xmlns="connect.logitech.com" mime="vnd.logitech.harmony/vnd.logitech.harmony.automation?getState"/></iq>`);
-        });
-
-        for(const id in automation) {
-            //const dev = new HarmonyBulb(this.adapter, this, id, automation[id]);
-        }
+        // const automation = await new Promise((resolve) => {
+        //     const autoId = Math.floor(Math.random() * 1000000);
+        //     this.client._responseHandlerQueue.push({
+        //         canHandleStanza: (s) => s.attr('id') == autoId,
+        //         deferred: { resolve },
+        //         responseType: 'json'
+        //     });
+        //     this.client._xmppClient.send(`<iq type="get" id="${autoId}"><oa xmlns="connect.logitech.com" mime="vnd.logitech.harmony/vnd.logitech.harmony.automation?getState"/></iq>`);
+        // });
+        //
+        // for(const id in automation) {
+        //     const dev = new HarmonyBulb(this.adapter, this, id, automation[id]);
+        // }
     }
 
     async notifyPropertyChanged(property) {
