@@ -68,7 +68,6 @@ class HarmonyDevice extends Device {
         this.rawId = device.id;
         this.rawType = device.type;
 
-        //TODO some actions are actually toggleable in the harmony app. Figure out how that state transition works.
         const handledActions = this.getHandledActions();
         for(const g of device.controlGroup) {
             if(g.function.length) {
@@ -82,6 +81,8 @@ class HarmonyDevice extends Device {
                 }
             }
         }
+
+        //TODO send events when activity with device starts/ends
 
         this.finalize(handledActions);
     }
