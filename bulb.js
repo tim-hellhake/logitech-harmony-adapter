@@ -24,17 +24,24 @@ class HarmonyBulb extends Device {
         super(adapter, id);
         this.hub = hub;
         this.type = "dimmableColorLight";
+        this["@type"] = [ "OnOffSwitch", "Light" ];
         //TODO human readable name is missing from API.
 
         this.properties.set('on', new Property(this, 'on', {
-            type: "boolean"
+            label: "On/Off",
+            type: "boolean",
+            "@type": "OnOffProperty"
         }, info.on));
         this.properties.set('level', new Property(this, 'level', {
+            label: "Brightness",
             type: "number",
-            unit: "percent"
+            unit: "percent",
+            "@type": "BrightnessProperty"
         }, this.getBrightness(info.birghtness)));
         this.properties.set('color', new Property(this, 'color', {
-            type: "string"
+            label: "Color",
+            type: "string",
+            "@type": "ColorProperty"
         }, this.getHex(info.color)));
 
         this.adapter.handleDeviceAdded(this);

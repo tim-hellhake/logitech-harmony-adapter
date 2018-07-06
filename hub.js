@@ -2,7 +2,7 @@
 
 const Property = require('./property');
 const HarmonyDevice = require('./device');
-const HarmonyBulb = require("./bulb");
+// const HarmonyBulb = require("./bulb");
 const harmony = require("harmonyhubjs-client");
 
 let Device;
@@ -18,6 +18,8 @@ catch (e) {
     Device = gwa.Device;
 }
 
+const OFF_LABEL = 'Off';
+
 class HarmonyHub extends Device {
     constructor(adapter, id, hub) {
         //TODO big client disconnect problems
@@ -25,10 +27,21 @@ class HarmonyHub extends Device {
         this.name = hub.friendlyName;
         this.description = "Logitech Harmony Hub";
         this.ip = hub.ip;
+        this['@type'] = [ 'OnOffSwitch' ];
+        this.activityMap = {};
 
         this.properties.set('on', new Property(this, 'on', {
-            type: "boolean"
+            label: "On/Off",
+            type: "boolean",
+            "@type": "OnOffProperty"
         }, false));
+
+        this.properties.set('activity', new Property(this, 'activity', {
+            label: "Activity",
+            type: "string",
+            "@type": "EnumProperty",
+            enum: [ OFF_LABEL ]
+        }, OFF_LABEL));
 
         this.ready = harmony(this.ip).then((client) => {
             this.client = client;
@@ -63,8 +76,15 @@ class HarmonyHub extends Device {
         this.client.on('stateDigest', (state) => {
             if(state.activityStatus == 0) {
                 this.updateProp('on', false);
+                this.updateProp('activity', OFF_LABEL);
             }
             else if(state.activityStatus == 2) {
+                for(const activityLabel in this.activityMap) {
+                    if(this.activityMap[activityLabel] == state.activityId) {
+                        this.updateProp('activity', activityLabel);
+                        break;
+                    }
+                }
                 this.updateProp('on', true);
             }
         });
@@ -89,16 +109,19 @@ class HarmonyHub extends Device {
         });
 
         const activities = await this.client.getActivities();
+        const currentActivity = await this.client.getCurrentActivity();
+        const activityProperty = this.findProperty('activity');
         for(const activity of activities) {
             if(activity.id != -1) {
-                this.addAction(activity.id, {
-                    label: activity.label,
-                    description: activity.label
-                });
+                this.activityMap[activity.label] = activity.id;
+                activityProperty.enum.push(activity.label);
+                if(currentActivity === activity.id) {
+                    activityProperty.setCachedValue(activity.label);
+                }
             }
         }
 
-        this.getChildDevices();
+        this.getChildDevices().catch(console.error);
     }
 
     async getChildDevices() {
@@ -106,7 +129,7 @@ class HarmonyHub extends Device {
 
         for(const device of commands.device) {
             const id = this.id + device.id;
-            if(device.controlGroup.length && !this.adapter.getDevice(id)) {
+            if(device.controlGroup.length && !this.adapter.getDevice(id) && device.manufacturer.toLowerCase() != 'sonos') {
                 const dev = new HarmonyDevice(this.adapter, this, id, device);
             }
         }
@@ -130,18 +153,22 @@ class HarmonyHub extends Device {
         switch(property.name) {
             case 'on':
                 if(property.value) {
-                    return Promise.reject("Don't know which activity to start, use activity actions instead.");
+                    throw "Don't know which activity to start, use activity actions instead.";
                 }
                 else {
                     await this.client.turnOff();
                 }
             break;
+            case 'activity':
+                if(property.value === OFF_LABEL) {
+                    await this.client.turnOff;
+                }
+                else if(this.activityMap.hasOwnProperty(property.value)) {
+                    await this.client.startActivity(this.activityMap[property.value]);
+                }
+            break;
         }
         super.notifyPropertyChanged(property);
-    }
-
-    async performAction(action) {
-        await this.client.startActivity(action.name);
     }
 }
 
