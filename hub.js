@@ -153,7 +153,7 @@ class HarmonyHub extends Device {
         switch(property.name) {
             case 'on':
                 if(property.value) {
-                    throw "Don't know which activity to start, use activity actions instead.";
+                    throw "Don't know which activity to start, use activity property instead.";
                 }
                 else {
                     await this.client.turnOff();
