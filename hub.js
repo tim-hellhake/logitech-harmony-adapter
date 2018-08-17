@@ -79,6 +79,7 @@ class HarmonyHub extends Device {
                 this.updateProp('activity', OFF_LABEL);
             }
             else if(state.activityStatus == 2) {
+                // this.notifyChildren(state.activityId);
                 for(const activityLabel in this.activityMap) {
                     if(this.activityMap[activityLabel] == state.activityId) {
                         this.updateProp('activity', activityLabel);
@@ -99,7 +100,9 @@ class HarmonyHub extends Device {
                                 const parsed = JSON.parse(change);
                                 if("musicMeta" in parsed) {
                                     const device = this.adapter.getDevice(this.id + parsed.musicMeta.deviceId);
-                                    device.updateMeta(parsed.musicMeta);
+                                    if(device) {
+                                        device.updateMeta(parsed.musicMeta);
+                                    }
                                 }
                             }
                         }
@@ -148,6 +151,13 @@ class HarmonyHub extends Device {
         //     const dev = new HarmonyBulb(this.adapter, this, id, automation[id]);
         // }
     }
+
+    // async notifyChildren(activityId) {
+    //     for(const device of devices) {
+    //         const child = this.adapter.getDevice(this.id + device.id);
+    //         child.handleActivity(activityId);
+    //     }
+    // }
 
     async notifyPropertyChanged(property) {
         switch(property.name) {

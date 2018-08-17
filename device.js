@@ -67,6 +67,7 @@ class HarmonyDevice extends Device {
         this.pendingActions = new Set();
         this.rawId = device.id;
         this.rawType = device.type;
+        // this.activities = new Set();
 
         const handledActions = this.getHandledActions();
         for(const g of device.controlGroup) {
@@ -82,10 +83,34 @@ class HarmonyDevice extends Device {
             }
         }
 
-        //TODO send events when activity with device starts/ends
+        // this.addEvent('on', {
+        //     type: 'string',
+        //     label: 'activity ID'
+        // });
+        //
+        // this.addEvent('off', {
+        //     type: 'string',
+        //     label: 'activity ID'
+        // });
+
+        //TODO figure out how a device <-> activity association is found
 
         this.finalize(handledActions);
     }
+
+    // addActivity(activityId) {
+    //     this.activities.add(activityId);
+    // }
+    //
+    // shouldHandleActivity(activityId) {
+    //     return this.activities.has(activityId);
+    // }
+    //
+    // handleActivity(activityId, direction) {
+    //     if(this.shouldHandleActivity(activityId)) {
+    //         this.eventDispatch(new Event(diection ? 'on' : 'off', activityId));
+    //     }
+    // }
 
     getHandledActions() {
         if(this.rawType == 'DigitalMusicServer') {
