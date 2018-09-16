@@ -1,6 +1,6 @@
 'use strict';
 
-const HarmonyHubDiscover = require("harmonyhubjs-discover");
+const { Explorer } = require("@harmonyhub/discover");
 const HarmonyHub = require("./hub");
 
 //TODO hue bulbs?
@@ -81,7 +81,7 @@ class HarmonyAdapter extends Adapter {
     */
     startPairing(_timeoutSeconds) {
         if(!this.discover) {
-            this.discover = new HarmonyHubDiscover(61991);
+            this.discover = new Explorer(61991);
             this.discover.on('online', (hub) => {
                 this.addDevice(hub).catch(console.error);
             });

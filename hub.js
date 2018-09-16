@@ -3,7 +3,7 @@
 const Property = require('./property');
 const HarmonyDevice = require('./device');
 // const HarmonyBulb = require("./bulb");
-const harmony = require("harmonyhubjs-client");
+const { getHarmonyClient } = require("@harmonyhub/client");
 
 let Device;
 try {
@@ -43,7 +43,7 @@ class HarmonyHub extends Device {
             enum: [ OFF_LABEL ]
         }, OFF_LABEL));
 
-        this.ready = harmony(this.ip).then((client) => {
+        this.ready = getHarmonyClient(this.ip).then((client) => {
             this.client = client;
             return this.setupClient();
         }).then(() => this.adapter.handleDeviceAdded(this));
@@ -90,26 +90,26 @@ class HarmonyHub extends Device {
             }
         });
 
-        this.client._xmppClient.on('stanza', (stanza) => {
-            if(stanza.name == 'message') {
-                for(const child of stanza.children) {
-                    if(child.name == "event" && child.attrs.type == 'harmonyengine.metadata?notify') {
-                        //has children with '{"musicMeta":{"crossfade":false,"deviceId":"34596878"}}' etc.
-                        for(const change of child.children) {
-                            if(typeof change === "string") {
-                                const parsed = JSON.parse(change);
-                                if("musicMeta" in parsed) {
-                                    const device = this.adapter.getDevice(this.id + parsed.musicMeta.deviceId);
-                                    if(device) {
-                                        device.updateMeta(parsed.musicMeta);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        // this.client._xmppClient.on('stanza', (stanza) => {
+        //     if(stanza.name == 'message') {
+        //         for(const child of stanza.children) {
+        //             if(child.name == "event" && child.attrs.type == 'harmonyengine.metadata?notify') {
+        //                 //has children with '{"musicMeta":{"crossfade":false,"deviceId":"34596878"}}' etc.
+        //                 for(const change of child.children) {
+        //                     if(typeof change === "string") {
+        //                         const parsed = JSON.parse(change);
+        //                         if("musicMeta" in parsed) {
+        //                             const device = this.adapter.getDevice(this.id + parsed.musicMeta.deviceId);
+        //                             if(device) {
+        //                                 device.updateMeta(parsed.musicMeta);
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
 
         const activities = await this.client.getActivities();
         const currentActivity = await this.client.getCurrentActivity();
