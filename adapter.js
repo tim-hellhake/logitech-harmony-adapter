@@ -102,8 +102,6 @@ class HarmonyAdapter extends Adapter {
         if(this.discover) {
             this.discover.stop();
             this.discover.removeAllListeners();
-            this.discover.ping.socket.unref();
-            this.discover.ping.socket = undefined;
             this.discover = undefined;
         }
     }
