@@ -1,5 +1,7 @@
 # logitech-harmony-adapter
 
+> Adapter may not be working as expected due to a Logitech security fix: https://www.home-assistant.io/blog/2018/12/17/logitech-harmony-removes-local-api/
+
 Logitech Harmony Hub adapter for the [Mozilla IoT gateway](https://iot.mozilla.org).
 
 Bridges the Harmony hub to the gateway so it can start activities and interact with
