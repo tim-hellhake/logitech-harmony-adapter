@@ -3,7 +3,7 @@
 const Property = require('./property');
 const HarmonyDevice = require('./device');
 // const HarmonyBulb = require("./bulb");
-const { getHarmonyClient } = require("@harmonyhub/client");
+const { getHarmonyClient } = require("@harmonyhub/client-ws");
 
 let Device;
 try {
