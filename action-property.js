@@ -11,7 +11,7 @@ class ActionProperty extends Property {
         super(device, name, {
             type: description.type,
             unit: description.unit,
-            label: description.label
+            title: description.title
         }, description.map(value));
         this.spec = description;
     }

@@ -31,13 +31,13 @@ class HarmonyHub extends Device {
         this.activityMap = {};
 
         this.properties.set('on', new Property(this, 'on', {
-            label: "On/Off",
+            title: "On/Off",
             type: "boolean",
             "@type": "OnOffProperty"
         }, false));
 
         this.properties.set('activity', new Property(this, 'activity', {
-            label: "Activity",
+            title: "Activity",
             type: "string",
             "@type": "EnumProperty",
             enum: [ OFF_LABEL ]

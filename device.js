@@ -25,21 +25,21 @@ const RECOGNIZTED_PROPERTIES = {
     muteState: {
         type: 'boolean',
         toggle: 'Mute',
-        label: 'muted'
+        title: 'muted'
     },
     status: {
         type: 'boolean',
         map: (v) => v !== 'pause',
         enable: 'Play',
         disable: 'Pause',
-        label: 'playing'
+        title: 'playing'
     },
     // volumeLevel: { very hard to do...
     //     type: 'number',
     //     unit: 'percent',
     //     increase: 'VolumeUp', // pretty sure there's a set command for this somewhere.
     //     decrease: 'VolumeDown',
-    //     label: 'volume'
+    //     title: 'volume'
     // },
     shuffle: {
         type: 'boolean',
@@ -75,7 +75,7 @@ class HarmonyDevice extends Device {
                 for(const action of g.function) {
                     if(!handledActions.includes(action.name)) {
                         this.addAction(action.name, {
-                            label: action.label
+                            title: action.label
                         });
                     }
                     this.actionInfo[action.name] = action.action;
@@ -85,12 +85,12 @@ class HarmonyDevice extends Device {
 
         // this.addEvent('on', {
         //     type: 'string',
-        //     label: 'activity ID'
+        //     title: 'activity ID'
         // });
         //
         // this.addEvent('off', {
         //     type: 'string',
-        //     label: 'activity ID'
+        //     title: 'activity ID'
         // });
 
         //TODO figure out how a device <-> activity association is found
