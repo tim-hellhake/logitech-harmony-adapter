@@ -12,5 +12,4 @@ Normally you will just want to install this from the add-ons list provided by
 the gateway.
 
 ## Building
-Before building, make sure to install the node packages without native extensions
-by running `npm ci --ignore-scripts`. After that, build the package using `build.sh`.
+Build the package using `build.sh`.

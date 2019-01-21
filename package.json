@@ -1,7 +1,7 @@
 {
   "name": "logitech-harmony-adapter",
   "display_name": "Logitech Harmony",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Support for Logitech Harmony hubs",
   "main": "adapter.js",
   "scripts": {
