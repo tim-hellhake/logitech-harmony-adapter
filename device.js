@@ -121,18 +121,18 @@ class HarmonyDevice extends Device {
 
     async getMetadata()
     {
-        if(this.rawType == 'DigitalMusicServer') {
-            const metadata = await new Promise((resolve) => {
-                const metaId = Math.floor(Math.random() * 1000000);
-                this.hub.client._responseHandlerQueue.push({
-                    canHandleStanza: (s) => s.attr('id') == metaId,
-                    deferred: { resolve },
-                    responseType: 'json'
-                });
-                this.hub.client._xmppClient.send(`<iq type="get" id="${metaId}"><oa xmlns="connect.logitech.com" mime="vnd.logitech.setup/vnd.logitech.setup.content?getAllMetadata">deviceId=${this.rawId}</oa></iq>`);
-            });
-            return metadata.musicMeta;
-        }
+        // if(this.rawType == 'DigitalMusicServer') {
+            // const metadata = await new Promise((resolve) => {
+                // const metaId = Math.floor(Math.random() * 1000000);
+                // this.hub.client._responseHandlerQueue.push({
+                //     canHandleStanza: (s) => s.attr('id') == metaId,
+                //     deferred: { resolve },
+                //     responseType: 'json'
+                // });
+                // this.hub.client._xmppClient.send(`<iq type="get" id="${metaId}"><oa xmlns="connect.logitech.com" mime="vnd.logitech.setup/vnd.logitech.setup.content?getAllMetadata">deviceId=${this.rawId}</oa></iq>`);
+            // });
+            // return metadata.musicMeta;
+        // }
         return {};
     }
 
@@ -151,11 +151,8 @@ class HarmonyDevice extends Device {
 
     async sendAction(actionName) {
         if(actionName in this.actionInfo) {
-            // Escape JSON for weird : = format.
-            const actionSpec = this.actionInfo[actionName].replace(/:/g, '::');
-            await this.hub.client.send('holdAction', `action=${actionSpec}:status=press`);
-            await wait(1000);
-            await this.hub.client.send('holdAction', `action=${actionSpec}:status=release`);
+            const actionSpec = this.actionInfo[actionName];
+            await this.hub.client.send('holdAction', actionSpec, 1000);
         }
         else {
             console.warn("Unknown action", actionName);

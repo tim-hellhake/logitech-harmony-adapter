@@ -58,11 +58,10 @@ class HarmonyHub extends Device {
     }
 
     async setupClient() {
-        this.client._xmppClient.on('offline', () => {
+        this.client.on('close', () => {
             harmony(this.ip).then((client) => {
                 this.client.end();
                 this.client.removeAllListeners();
-                this.client._xmppClient.removeAllListeners();
                 this.client = client;
                 return this.setupClient();
             });
