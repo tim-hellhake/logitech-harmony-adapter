@@ -12,4 +12,4 @@ Normally you will just want to install this from the add-ons list provided by
 the gateway.
 
 ## Building
-Build the package using `build.sh`. Afterward go into the tgz and remove `bulb.js` from the `SHA256SUMS` file.
+Build the package using `build.sh`.
