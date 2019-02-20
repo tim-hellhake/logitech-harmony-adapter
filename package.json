@@ -27,8 +27,8 @@
   },
   "homepage": "https://github.com/freaktechnik/logitech-harmony-adapter#readme",
   "dependencies": {
-    "@harmonyhub/client-ws": "^1.0.2",
-    "@harmonyhub/discover": "^1.0.6"
+    "@harmonyhub/client-ws": "^1.0.3",
+    "@harmonyhub/discover": "^1.0.7"
   },
   "files": [
     "adapter.js",

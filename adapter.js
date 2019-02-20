@@ -33,10 +33,6 @@ class HarmonyAdapter extends Adapter {
     async addDevice(device) {
         if(device.uuid in this.devices) {
             throw 'Device: ' + device.uuid + ' already exists.';
-            const dev = this.getDevice(device.uuid);
-            if(dev instanceof HarmonyHub) {
-                await dev.getChildDevices();
-            }
         }
         else {
             const hub = new HarmonyHub(this, device.uuid, device);
@@ -44,33 +40,39 @@ class HarmonyAdapter extends Adapter {
         }
     }
 
-    /**
-    * @param {String} deviceId ID of the device to remove.
-    * @return {Promise} which resolves to the device removed.
-    */
-    async removeDevice(deviceId) {
-        const device = this.devices[deviceId];
-        if(device) {
-            const deviceCount = Object.keys(this.devices).length;
-            const isHub = device instanceof HarmonyHub;
-            if(deviceCount == 1 && isHub) {
-                device.client.end();
-                device.client.removeAllListeners();
-                device.client._xmppClient.removeAllListeners();
+    async removeDevice(device, force = false) {
+        const isHub = device instanceof HarmonyHub;
+        let devicesForHub = 0;
+        if(isHub) {
+            for(const dev of Object.values(this.devices)) {
+                if(dev.id !== device.id && !(dev instanceof HarmonyHub) && dev.hub.id === device.id) {
+                    if(force) {
+                        await this.removeThing(dev);
+                    }
+                    else {
+                        ++devicesForHub;
+                    }
+                }
             }
-            // Only remove hub when it's the last device. Breaks if there are multiple hubs...
-            if(!isHub || deviceCount == 1) {
-                this.handleDeviceRemoved(device);
+            this.handleDeviceRemoved(device);
+            // Only unload hub when it's the last device depending on itself.
+            if(devicesForHub === 0) {
+                device.unload();
             }
-
-            if(!isHub && deviceCount == 2 && this.getDevice(device.hub.id)) {
-                await this.removeDevice(device.hub.id);
-            }
-
-            return device;
         }
         else {
-            throw 'Device: ' + deviceId + ' not found.';
+            this.handleDeviceRemoved(device);
+            for(const dev of Object.values(this.devices)) {
+                if(dev.id !== device.hub.id && !(dev instanceof HarmonyHub) && device.hub.id === dev.hub.id) {
+                    ++devicesForHub;
+                }
+            }
+            if(devicesForHub === 0 && this.getDevice(device.hub.id)) {
+                await this.removeDevice(device.hub.id);
+            }
+            else {
+                device.hub.unload();
+            }
         }
     }
 
@@ -87,8 +89,7 @@ class HarmonyAdapter extends Adapter {
             });
 
             this.discover.on('offline', (hub) => {
-                //TODO should probably also remove all child devices controlled by this hub.
-                this.removeDevice(hub.uuid).catch(console.error);
+                this.removeDevice(hub.uuid, true).catch(console.error);
             });
             this.discover.start();
             setTimeout(() => this.cancelPairing(), _timeoutSeconds * 1000);
@@ -109,15 +110,28 @@ class HarmonyAdapter extends Adapter {
     /**
     * Unpair the provided the device from the adapter.
     *
-    * @param {Object} device Device to unpair with
+    * @param {Object} device Device to unpair with.
+    * @param {boolean} [force=false] If all child devices should also be removed.
     */
-    removeThing(device) {
-        this.removeDevice(device.id).then(() => {
+    removeThing(device, force = false) {
+        this.removeDevice(device, force).then(() => {
             console.log('HarmonyAdapter: device:', device.id, 'was unpaired.');
         }).catch((err) => {
             console.error('HarmonyAdapter: unpairing', device.id, 'failed');
             console.error(err);
         });
+    }
+
+    async unload() {
+        for(const device of Object.values(this.devices)) {
+            if(device instanceof HarmonyHub) {
+                device.unload();
+            }
+            else {
+                device.hub.unload();
+            }
+        }
+        return super.unload();
     }
 }
 

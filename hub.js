@@ -43,7 +43,10 @@ class HarmonyHub extends Device {
             enum: [ OFF_LABEL ]
         }, OFF_LABEL));
 
-        this.ready = getHarmonyClient(this.ip).then((client) => {
+        this.ready = getHarmonyClient(this.ip, {
+            remoteId: hub.fullHubInfo.remoteId,
+            port: hub.fullHubInfo.port
+        }).then((client) => {
             this.client = client;
             return this.setupClient();
         }).then(() => this.adapter.handleDeviceAdded(this));
@@ -60,10 +63,14 @@ class HarmonyHub extends Device {
     async setupClient() {
         this.client.on('close', () => {
             harmony(this.ip).then((client) => {
-                this.client.end();
-                this.client.removeAllListeners();
+                this.unload();
                 this.client = client;
                 return this.setupClient();
+            }).catch(async (e) => {
+                // IP probably changed
+                console.error(e);
+                await this.adapter.removeThing(this.id, true);
+                this.adapter.startPairing(60);
             });
         });
 
@@ -178,6 +185,12 @@ class HarmonyHub extends Device {
             break;
         }
         super.notifyPropertyChanged(property);
+    }
+
+    unload() {
+        this.client.end();
+        this.client.removeAllListeners();
+        // this.client._xmppClient.removeAllListeners();
     }
 }
 
