@@ -62,7 +62,7 @@ class HarmonyHub extends Device {
 
     async setupClient() {
         this.client.on('close', () => {
-            harmony(this.ip).then((client) => {
+            getHarmonyClient(this.ip).then((client) => {
                 this.unload();
                 this.client = client;
                 return this.setupClient();

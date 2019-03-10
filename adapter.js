@@ -68,7 +68,7 @@ class HarmonyAdapter extends Adapter {
                 }
             }
             if(devicesForHub === 0 && this.getDevice(device.hub.id)) {
-                await this.removeDevice(device.hub.id);
+                await this.removeDevice(this.getDevice(device.hub.id));
             }
             else {
                 device.hub.unload();
@@ -89,7 +89,7 @@ class HarmonyAdapter extends Adapter {
             });
 
             this.discover.on('offline', (hub) => {
-                this.removeDevice(hub.uuid, true).catch(console.error);
+                this.removeDevice(this.getDevice(hub.uuid), true).catch(console.error);
             });
             this.discover.start();
             setTimeout(() => this.cancelPairing(), _timeoutSeconds * 1000);
