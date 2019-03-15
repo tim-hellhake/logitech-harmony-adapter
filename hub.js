@@ -69,7 +69,7 @@ class HarmonyHub extends Device {
             }).catch(async (e) => {
                 // IP probably changed
                 console.error(e);
-                await this.adapter.removeThing(this.id, true);
+                await this.adapter.removeThing(this, true);
                 this.adapter.startPairing(60);
             });
         });
