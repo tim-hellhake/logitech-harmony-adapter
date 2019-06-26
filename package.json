@@ -1,7 +1,7 @@
 {
   "name": "logitech-harmony-adapter",
   "display_name": "Logitech Harmony",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Support for Logitech Harmony hubs",
   "main": "adapter.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "logitech",
     "harmony"
   ],
-  "author": "Martin Giger",
+  "author": "Tim Hellhake",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/freaktechnik/logitech-harmony-adapter/issues"
