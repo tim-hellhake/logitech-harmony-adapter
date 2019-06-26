@@ -1,7 +1,7 @@
 {
   "name": "logitech-harmony-adapter",
   "display_name": "Logitech Harmony",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Support for Logitech Harmony hubs",
   "main": "adapter.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/freaktechnik/logitech-harmony-adapter.git"
+    "url": "git+https://github.com/tim-hellhake/logitech-harmony-adapter.git"
   },
   "keywords": [
     "mozilla",
@@ -23,9 +23,9 @@
   "author": "Tim Hellhake",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/freaktechnik/logitech-harmony-adapter/issues"
+    "url": "https://github.com/tim-hellhake/logitech-harmony-adapter/issues"
   },
-  "homepage": "https://github.com/freaktechnik/logitech-harmony-adapter#readme",
+  "homepage": "https://github.com/tim-hellhake/logitech-harmony-adapter#readme",
   "dependencies": {
     "@harmonyhub/client-ws": "^1.0.4",
     "@harmonyhub/discover": "^1.0.8"
