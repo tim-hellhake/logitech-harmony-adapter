@@ -41,13 +41,13 @@
   ],
   "moziot": {
     "api": {
-      "min": 1,
+      "min": 2,
       "max": 2
     },
     "plugin": true,
     "exec": "{nodeLoader} {path}"
   },
   "devDependencies": {
-    "nlf": "^2.0.1"
+    "nlf": "^2.1.1"
   }
 }

@@ -2,20 +2,8 @@
 
 // See https://gist.github.com/freaktechnik/53e8bf5d80fcf3ab44361cc240acdbd6
 
+const { Device } = require('gateway-addon');
 const Property = require('./property');
-
-let Device;
-try {
-    Device = require('../device');
-}
-catch (e) {
-    if (e.code !== 'MODULE_NOT_FOUND') {
-        throw e;
-    }
-
-    const gwa = require('gateway-addon');
-    Device = gwa.Device;
-}
 
 const MAX_BRIGHTNESS = 255;
 

@@ -13,3 +13,7 @@ the gateway.
 
 ## Building
 Build the package using `build.sh`.
+
+# Credits
+
+This add-on was originally created by Martin Giger (@freaktechnik).

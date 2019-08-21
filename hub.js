@@ -1,22 +1,10 @@
 'use strict';
 
+const { Device } = require('gateway-addon');
 const Property = require('./property');
 const HarmonyDevice = require('./device');
 // const HarmonyBulb = require("./bulb");
 const { getHarmonyClient } = require("@harmonyhub/client-ws");
-
-let Device;
-try {
-    Device = require('../device');
-}
-catch (e) {
-    if (e.code !== 'MODULE_NOT_FOUND') {
-        throw e;
-    }
-
-    const gwa = require('gateway-addon');
-    Device = gwa.Device;
-}
 
 const OFF_LABEL = 'Off';
 
