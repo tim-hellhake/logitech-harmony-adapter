@@ -1,0 +1,19 @@
+{
+  "manifest_version": 1,
+  "id": "logitech-harmony-adapter",
+  "name": "Logitech Harmony",
+  "short_name": "Harmony",
+  "version": "0.2.7",
+  "description": "Support for Logitech Harmony hubs",
+  "homepage_url": "https://github.com/tim-hellhake/logitech-harmony-adapter#readme",
+  "license": "MIT",
+  "author": "Tim Hellhake",
+  "gateway_specific_settings": {
+    "webthings": {
+      "exec": "{nodeLoader} {path}",
+      "strict_min_version": "0.10.0",
+      "strict_max_version": "*",
+      "primary_type": "adapter"
+    }
+  }
+}
