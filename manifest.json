@@ -3,7 +3,7 @@
   "id": "logitech-harmony-adapter",
   "name": "Logitech Harmony",
   "short_name": "Harmony",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Support for Logitech Harmony hubs",
   "homepage_url": "https://github.com/tim-hellhake/logitech-harmony-adapter#readme",
   "license": "MIT",
