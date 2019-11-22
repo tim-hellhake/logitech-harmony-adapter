@@ -1,22 +1,10 @@
 'use strict';
 
+const { Adapter } = require('gateway-addon');
 const { Explorer } = require("@harmonyhub/discover");
 const HarmonyHub = require("./hub");
 
 //TODO hue bulbs?
-
-let Adapter;
-try {
-    Adapter = require('../adapter');
-}
-catch (e) {
-    if (e.code !== 'MODULE_NOT_FOUND') {
-        throw e;
-    }
-
-    const gwa = require('gateway-addon');
-    Adapter = gwa.Adapter;
-}
 
 class HarmonyAdapter extends Adapter {
     constructor(addonManager, packageName) {

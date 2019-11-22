@@ -1,19 +1,7 @@
 'use strict';
 
 const ActionProperty = require("./action-property");
-
-let Device;
-try {
-    Device = require('../device');
-}
-catch (e) {
-    if (e.code !== 'MODULE_NOT_FOUND') {
-        throw e;
-    }
-
-    const gwa = require('gateway-addon');
-    Device = gwa.Device;
-}
+const { Device } = require('gateway-addon');
 
 const wait = (time) => {
     return new Promise((resolve) => {
