@@ -6,8 +6,7 @@ tar xzf ${TARFILE}
 npm ci --ignore-scripts
 npm run licenses
 cd package
-sha256sum LICENSE > SHA256SUMS
-sha256sum manifest.json >> SHA256SUMS
+sha256sum LICENSE manifest.json README.md > SHA256SUMS
 cd ..
 sha256sum package.json adapter.js device.js hub.js action-property.js >> package/SHA256SUMS
 rm -rf node_modules
